@@ -2,10 +2,9 @@ import { memo, useState, useRef, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 import { IoCloseCircle } from 'react-icons/io5'
-import { FcSearch } from 'react-icons/fc'
+import { BiSearch } from 'react-icons/bi'
 import { BsPatchCheckFill } from 'react-icons/bs'
 import { toast } from 'react-toastify'
-import clsx from 'clsx'
 import HeadlessTippy from '@tippyjs/react/headless'
 
 import { useDebounce } from '~/hooks'
@@ -14,7 +13,7 @@ import { updateData } from '~/store/reducers/userSlice'
 import CustomLoading from '~/components/CustomLoading'
 import Image from '~/components/Image'
 
-function Searchbar({ user, dispatch }) {
+function Search({ user, dispatch }) {
 	const navigate = useNavigate()
 	const inputRef = useRef()
 	const [search, setSearch] = useState('')
@@ -23,48 +22,48 @@ function Searchbar({ user, dispatch }) {
 	const [loading, setLoading] = useState(false)
 	const debouncedValue = useDebounce(search, 500)
 
+	const fetchApi = async () => {
+		setLoading(true)
+		const arr1 = []
+		const arr2 = []
+
+		const users = await getDocs(collection(db, 'users'))
+		const products = await getDocs(collection(db, 'products'))
+		users.forEach((doc) => arr1.push(doc.data()))
+		products.forEach((doc) => arr2.push(doc.data()))
+
+		const usersFilter = arr1.filter((user) => {
+			const { username, displayName, email, email_alt, uid } = user
+
+			return (
+				displayName
+					.toLowerCase()
+					.includes(debouncedValue.toLowerCase()) ||
+				email.includes(debouncedValue) ||
+				email_alt.includes(debouncedValue) ||
+				uid.includes(debouncedValue) ||
+				username.includes(debouncedValue)
+			)
+		})
+
+		const productsFilter = arr2.filter((product) => {
+			const { name, slug, id } = product
+			return (
+				name.toLowerCase().includes(debouncedValue.toLowerCase()) ||
+				slug.includes(debouncedValue) ||
+				id.includes(debouncedValue)
+			)
+		})
+
+		const results = [...usersFilter, ...productsFilter]
+		setSearchResult(results)
+		setLoading(false)
+	}
+
 	useEffect(() => {
 		if (!debouncedValue.trim()) {
 			setSearchResult([])
 			return
-		}
-
-		const fetchApi = async () => {
-			setLoading(true)
-			const arr1 = []
-			const arr2 = []
-
-			const users = await getDocs(collection(db, 'users'))
-			const products = await getDocs(collection(db, 'products'))
-			users.forEach((doc) => arr1.push(doc.data()))
-			products.forEach((doc) => arr2.push(doc.data()))
-
-			const usersFilter = arr1.filter((user) => {
-				const { username, displayName, email, email_alt, uid } = user
-
-				return (
-					displayName
-						.toLowerCase()
-						.includes(debouncedValue.toLowerCase()) ||
-					email.includes(debouncedValue) ||
-					email_alt.includes(debouncedValue) ||
-					uid.includes(debouncedValue) ||
-					username.includes(debouncedValue)
-				)
-			})
-
-			const productsFilter = arr2.filter((product) => {
-				const { name, slug, id } = product
-				return (
-					name.toLowerCase().includes(debouncedValue.toLowerCase()) ||
-					slug.includes(debouncedValue) ||
-					id.includes(debouncedValue)
-				)
-			})
-
-			const results = [...usersFilter, ...productsFilter]
-			setSearchResult(results)
-			setLoading(false)
 		}
 
 		fetchApi()
@@ -76,26 +75,23 @@ function Searchbar({ user, dispatch }) {
 		inputRef.current.focus()
 	}
 
-	const handleHideResult = () => {
-		setShowResult(false)
-	}
+	const handleHideResult = () => setShowResult(false)
 
 	const handleChange = (e) => {
 		const searchValue = e.target.value
-		if (!searchValue.startsWith(' ')) {
-			setSearch(searchValue)
-		}
+		if (!searchValue.startsWith(' ')) setSearch(searchValue)
 	}
 
-	const handleKeyDown = (e) => {
-		if (e.key === 'Enter') return handleSearch()
-	}
+	const handleKeyDown = (e) => e.key === 'Enter' && handleSearch()
 
 	const handleSearch = () => {
-		if (search.trim().length === 0) {
-			toast.error('Vui lòng nhập từ khóa!')
+		if (!search.trim()) {
+			toast.error('Vui lòng nhập từ khóa cần tìm kiếm')
 			return
 		}
+
+		navigate(`/search/${encodeURIComponent(search)}`)
+		handleHideResult()
 
 		const newRecent = {
 			...user.recent,
@@ -107,11 +103,6 @@ function Searchbar({ user, dispatch }) {
 				...user.recent.search,
 			],
 		}
-
-		navigate(
-			`/search?q=${search}&at=${new Date().getTime()}&alias=${uuidv4()}`
-		)
-		handleHideResult()
 
 		updateDoc(doc(db, 'users', user.uid), {
 			recent: newRecent,
@@ -170,13 +161,7 @@ function Searchbar({ user, dispatch }) {
 					</div>
 				)}
 				onClickOutside={handleHideResult}>
-				<div
-					className={clsx(
-						'flex w-[400px] mx-auto border-2 rounded-full transition',
-						{
-							'border-gray-400': showResult,
-						}
-					)}>
+				<div className='flex w-[400px] bg-gray-100 mx-auto border-2 rounded-full transition'>
 					<div className='flex-1 flex items-center px-2 gap-2'>
 						<input
 							ref={inputRef}
@@ -185,7 +170,7 @@ function Searchbar({ user, dispatch }) {
 							onChange={handleChange}
 							onFocus={() => setShowResult(true)}
 							onKeyDown={handleKeyDown}
-							className='flex-1 block p-2 pr-0 rounded-full outline-none'
+							className='flex-1 block p-2 pr-0 rounded-full outline-none bg-transparent'
 							placeholder='Tìm kiếm người dùng, sản phẩm,...'
 						/>
 
@@ -203,9 +188,9 @@ function Searchbar({ user, dispatch }) {
 					</div>
 
 					<button
-						className='shrink-0 flex items-center justify-center w-12 hover:bg-gray-200 border border-transparent border-l-gray-300 rounded-tr-full rounded-br-full transition'
+						className='shrink-0 flex items-center justify-center w-12 hover:bg-gray-200 border border-transparent border-l-gray-200 rounded-tr-full rounded-br-full transition'
 						onClick={handleSearch}>
-						<FcSearch size='1.2em' />
+						<BiSearch size='1.2em' />
 					</button>
 				</div>
 			</HeadlessTippy>
@@ -213,4 +198,4 @@ function Searchbar({ user, dispatch }) {
 	)
 }
 
-export default memo(Searchbar)
+export default memo(Search)

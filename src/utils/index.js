@@ -35,11 +35,3 @@ export const formatDate = (timestamp) => {
 export const handleURL = (from, to) => {
 	return window.location.href.replace(from, to)
 }
-
-export const handleString = (text, max = 30) => {
-	if (text.length > max) {
-		text = text.substring(0, max - 3) + '...'
-	}
-
-	return text
-}

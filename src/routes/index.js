@@ -45,7 +45,7 @@ export const publicRoutes = [
 		component: User,
 	},
 	{
-		path: '/search',
+		path: '/search/:query',
 		component: Search,
 		layout: NoSidebar,
 	},

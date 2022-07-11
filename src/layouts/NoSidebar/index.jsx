@@ -1,7 +1,8 @@
+import { memo } from 'react'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 
-export default function NoSidebar({ children }) {
+function NoSidebar({ children }) {
 	return (
 		<>
 			<Header />
@@ -12,3 +13,5 @@ export default function NoSidebar({ children }) {
 		</>
 	)
 }
+
+export default memo(NoSidebar)

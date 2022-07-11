@@ -10,9 +10,9 @@ import { BsShop } from 'react-icons/bs'
 import { userSelector, setData } from '~/store/reducers/userSlice'
 import { auth, signOut } from '~/config'
 import images from '~/assets/images'
-import Searchbar from './Searchbar'
+import Search from './Search'
 import Actions from './Actions'
-import MobileMenu from './MobileMenu'
+import MobileMenu from './Mobile'
 
 function Header() {
 	const user = useSelector(userSelector)
@@ -73,13 +73,8 @@ function Header() {
 				<h1 className='uppercase text-lg font-semibold'>hanime shop</h1>
 			</div>
 
-			{/* Mobile Menu */}
+			<Search dispatch={dispatch} />
 			<MobileMenu {...settings} />
-
-			{/* Search */}
-			<Searchbar {...settings} />
-
-			{/* Actions */}
 			<Actions {...settings} />
 		</header>
 	)

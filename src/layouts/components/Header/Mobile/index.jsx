@@ -24,6 +24,7 @@ function MobileMenu({ links, user, handleSignOut }) {
 				onClick={toggle}>
 				<BiMenu size='1.4em' />
 			</button>
+
 			<animated.div
 				className='absolute top-16 left-0 flex flex-col gap-3 w-full h-[calc(100vh-64px)] pt-4 pl-4 bg-white'
 				style={{
