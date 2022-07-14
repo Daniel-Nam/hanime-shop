@@ -4,9 +4,10 @@ import { BsPatchCheckFill } from 'react-icons/bs'
 import { MdAdminPanelSettings } from 'react-icons/md'
 
 import { db, getDocs, collection, where, query } from '~/config'
-import { formatDate, renderIcons } from '~/utils'
+import { formatDate } from '~/utils'
 import Loading from '~/components/Loading'
 import Image from '~/components/Image'
+import RenderIcons from '~/components/RenderIcons'
 
 function User() {
 	const { username } = useParams()
@@ -109,7 +110,9 @@ function User() {
 						<div
 							key={item.id}
 							className='flex items-center gap-3 py-2 px-3 border rounded-sm max-w-fit'>
-							<div>{renderIcons(item.name)}</div>
+							<div>
+								<RenderIcons name={item.name} />
+							</div>
 							<div>
 								{item.url ? (
 									<a

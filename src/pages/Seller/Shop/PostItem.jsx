@@ -7,7 +7,7 @@ import { useSpring, animated } from 'react-spring'
 import { v4 as uuidv4 } from 'uuid'
 
 import { updateData } from '~/store/reducers/userSlice'
-import { doc, db, deleteDoc } from '~/config'
+import { doc, db, deleteDoc, deleteObject, ref, storage } from '~/config'
 import { formatPrice } from '~/utils'
 import Image from '~/components/Image'
 
@@ -23,7 +23,17 @@ function PostItem({ post, user, setLoading, fetchData }) {
 
 	const handleDelete = async () => {
 		setLoading(true)
+		const id = toast.loading('Đang xoá...')
 		await deleteDoc(doc(db, 'products', post.id))
+
+		for (let i = 0; i < post.images.length; i++) {
+			await deleteObject(ref(storage, post.images[i].path)).then(() => {
+				toast.update(id, {
+					render: `Đã xoá ${i + 1}/${post.images.length} ảnh`,
+				})
+			})
+		}
+
 		dispatch(
 			updateData({
 				recent: {
@@ -38,7 +48,15 @@ function PostItem({ post, user, setLoading, fetchData }) {
 				},
 			})
 		)
+
 		fetchData()
+
+		toast.update(id, {
+			render: 'Đã xoá thành công',
+			type: 'success',
+			autoClose: 3000,
+			isLoading: false,
+		})
 		setLoading(false)
 	}
 
@@ -68,7 +86,7 @@ function PostItem({ post, user, setLoading, fetchData }) {
 			<div className='relative flex items-center gap-3 p-2 pr-6 border overflow-hidden'>
 				<div className='shrink-0'>
 					<Image
-						src={post.images[0]}
+						src={post.images[0].url}
 						alt=''
 						className='block w-20 h-20 object-cover rounded-sm'
 					/>

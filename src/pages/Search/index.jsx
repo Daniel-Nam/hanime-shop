@@ -3,10 +3,9 @@ import { useParams, Link } from 'react-router-dom'
 import { BsPatchCheckFill } from 'react-icons/bs'
 
 import { db, getDocs, collection } from '~/config'
-import { calcAndFormat, formatPrice } from '~/utils'
-import { BsFillEmojiHeartEyesFill } from 'react-icons/bs'
 import Image from '~/components/Image'
 import CustomLoading from '~/components/CustomLoading'
+import RenderProducts from '~/components/RenderProducts'
 
 function Search() {
 	const { query } = useParams()
@@ -88,58 +87,7 @@ function Search() {
 						<div className='text-xl font-semibold mb-3'>
 							Sản phẩm
 						</div>
-						<div className='grid gap-5 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'>
-							{products.map((product) => (
-								<div
-									key={product.id}
-									className='relative border shadow rounded-sm transition hover:shadow-xl hover:scale-105'>
-									{product.isFavorite && (
-										<div className='absolute -top-2 -left-2 p-1 bg-indigo-500 text-white rounded-full'>
-											<BsFillEmojiHeartEyesFill />
-										</div>
-									)}
-
-									{product.discount > 0 && (
-										<div className='absolute top-0 right-0 text-sm text-white bg-blue-500 rounded-bl-md p-1'>
-											{product.discount}% giảm
-										</div>
-									)}
-
-									<div>
-										<Link to={`/product/${product.slug}`}>
-											<Image
-												src={product.images[0]}
-												alt={product.images[0]}
-												className='w-full h-[140px] md:h-[200px] object-cover'
-											/>
-										</Link>
-									</div>
-									<div className='flex flex-col h-[calc(100%-140px)] md:h-[calc(100%-200px)] p-2'>
-										<div className='line-clamp-2 font-bold'>
-											<Link
-												to={`/product/${product.slug}`}>
-												{product.name}
-											</Link>
-										</div>
-
-										{/* Price */}
-										<div className='flex items-center justify-between flex-wrap w-full mt-auto'>
-											<div className='text-red-500 font-semibold'>
-												₫{' '}
-												{calcAndFormat(
-													product.price,
-													product.discount
-												)}
-											</div>
-											<div className='text-sm text-gray-600'>
-												Đã bán{' '}
-												{formatPrice(product.soldCount)}
-											</div>
-										</div>
-									</div>
-								</div>
-							))}
-						</div>
+						<RenderProducts data={products} />
 					</div>
 				)}
 				{users.length > 0 && (

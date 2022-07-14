@@ -6,11 +6,6 @@ import { toast } from 'react-toastify'
 function StarRating({ rating, setRating, product, user, fetchData }) {
 	const [hover, setHover] = useState(0)
 
-	const reset = () => {
-		setRating(0)
-		setHover(0)
-	}
-
 	const handleRating = (index) => {
 		if (!user) {
 			toast.error('Bạn cần đăng nhập để đánh giá!')
@@ -57,7 +52,6 @@ function StarRating({ rating, setRating, product, user, fetchData }) {
 						className={`transition
 						${index <= (hover || rating) ? 'text-rose-500' : 'text-gray-400'}`}
 						onClick={handleRating.bind(this, index)}
-						onDoubleClick={reset}
 						onMouseEnter={() => setHover(index)}
 						onMouseLeave={() => setHover(rating)}>
 						<span className='star'>

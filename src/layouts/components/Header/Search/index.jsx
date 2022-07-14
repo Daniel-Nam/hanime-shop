@@ -122,7 +122,7 @@ function Search({ user, dispatch }) {
 					<div
 						tabIndex='-1'
 						{...attrs}
-						className='flex flex-col gap-2 w-[400px] rounded-md py-3 px-5 bg-white border shadow-lg'>
+						className='animate-drop flex flex-col gap-2 w-[400px] rounded-md py-3 px-5 bg-white border shadow-lg'>
 						{searchResult.slice(0, 6).map((result) => (
 							<Link
 								to={
@@ -132,14 +132,17 @@ function Search({ user, dispatch }) {
 								}
 								key={uuidv4()}
 								className='flex items-center gap-2'>
-								<Image
-									src={
-										result.images
-											? result.images[0]
-											: result.photoURL
-									}
-									className='w-8 h-8 rounded-full object-cover'
-								/>
+								<div className='shrink-0'>
+									<Image
+										src={
+											result.images
+												? result.images[0].url
+												: result.photoURL
+										}
+										className='block w-8 h-8 rounded-full object-cover'
+									/>
+								</div>
+
 								<div className='flex items-center gap-1'>
 									<h4 className='line-clamp-1'>
 										{result.name || result.displayName}
@@ -155,7 +158,7 @@ function Search({ user, dispatch }) {
 							<div
 								className='text-blue-500 text-center font-semibold'
 								onClick={handleSearch}>
-								Xem thêm...
+								Xem thêm
 							</div>
 						)}
 					</div>

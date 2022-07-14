@@ -1,4 +1,3 @@
-export { default as renderIcons } from './renderIcons'
 export { default as uniqueSlug } from './uniqueSlug'
 
 export const priceAfterDiscount = (price, discount) => {

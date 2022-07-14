@@ -128,7 +128,7 @@ function Shop() {
 					<div className='flex items-center justify-center gap-3 p-4 text-white bg-indigo-500 shadow-md shadow-indigo-500/50 rounded-md'>
 						<BsCashCoin size='1.5em' />
 						<div>
-							₫ s
+							₫{' '}
 							<animated.span>
 								{profit.to((n) => formatPrice(n.toFixed(0)))}
 							</animated.span>

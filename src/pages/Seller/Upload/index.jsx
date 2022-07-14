@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { toast } from 'react-toastify'
 import { v4 as uuidv4 } from 'uuid'
 import { FcAddImage } from 'react-icons/fc'
+import { IoClose } from 'react-icons/io5'
 import {
 	AiOutlineLeft,
 	AiOutlineDoubleLeft,
@@ -39,6 +40,7 @@ function Upload() {
 	const [loading, setLoading] = useState(false)
 	const [previews, setPreviews] = useState([])
 	const [files, setFiles] = useState([])
+	const [sizes, setSizes] = useState([])
 
 	useEffect(() => {
 		if (!user.isSeller) {
@@ -48,26 +50,44 @@ function Upload() {
 	}, [user])
 
 	useEffect(() => {
-		if (name.trim().length > 0) {
-			document.title = name
-			return
-		}
-
-		document.title = 'Hanime Shop | Upload'
+		document.title = name ? `${name} | Upload` : 'Upload'
 	}, [name])
 
 	useEffect(() => {
 		return () => {
-			for (const url of previews) {
-				URL.revokeObjectURL(url)
-			}
+			for (const url of previews) URL.revokeObjectURL(url)
 		}
 	}, [previews])
 
+	const handleChangeName = (e) => {
+		if (e.target.value.startsWith(' ')) {
+			setName(name)
+			return
+		}
+
+		setName(e.target.value)
+	}
+
 	const handleChangeDesc = (e) => {
-		const value = e.target.value.replace(/\r?\n/g, '<br>')
+		const value = e.target.value.replace(/\r?\n/g, '<p><br></p>')
 		setDescription(value)
 	}
+
+	const handleAddSize = (e) => {
+		if (e.target.value.startsWith(' ')) return
+		if (!e.target.value.trim()) return
+
+		if (e.key === 'Enter') {
+			const newSizes = [...sizes]
+			newSizes.push(e.target.value.toUpperCase())
+			const arr = new Set([...newSizes])
+			setSizes(Array.from(arr))
+			e.target.value = ''
+		}
+	}
+
+	const handleDeleteSize = (i) =>
+		setSizes(sizes.filter((_, index) => index !== i))
 
 	const handleChangeImages = (e) => {
 		const files = e.target.files
@@ -100,13 +120,13 @@ function Upload() {
 			setLoading(false)
 			toast.error('Vui lòng chọn ít nhất 1 hình ảnh!')
 			return
+		} else if (length < 5) {
+			setLoading(false)
+			toast.error('Vui lòng chọn ít nhất 5 hình ảnh!')
+			return
 		}
 
-		if (
-			price.trim() === '' ||
-			discount.trim() === '' ||
-			productCount.trim() === ''
-		) {
+		if (!price.trim() || !discount.trim() || !productCount.trim()) {
 			setLoading(false)
 			toast.error('Vui lòng nhập đầy đủ thông tin!')
 			return
@@ -117,12 +137,12 @@ function Upload() {
 		) {
 			setLoading(false)
 			toast.error(
-				'Giá, giảm giá, số lượng sản phẩm phải là số liền nhau!'
+				'Giá, giảm giá, số lượng sản phẩm phải là số và liền nhau!'
 			)
 			return
-		} else if (parseInt(price) <= 0 || parseInt(price) <= 0) {
+		} else if (parseInt(price) <= 0 || parseInt(productCount) <= 0) {
 			setLoading(false)
-			toast.error('Giá trị không được nhỏ hơn 0!')
+			toast.error('Giá và số lượng sản phẩm không được nhỏ hơn 0!')
 			return
 		} else if (parseInt(discount) >= 100) {
 			setLoading(false)
@@ -137,77 +157,84 @@ function Upload() {
 			value: name,
 		})
 
-		for (let i = 0; i < length; i++) {
-			const file = files[i]
-			const storageRef = await ref(storage, `images/${uuidv4()}`)
-			await uploadBytes(storageRef, file)
-				.then(async (res) => {
-					await getDownloadURL(ref(storage, res.ref.fullPath))
-						.then((url) => {
-							toast.success('Tải hình ảnh thành công!')
-							arr.push(url)
-						})
-						.catch((err) => toast.error(err.message))
-				})
-				.catch((error) => toast.error(error.message))
-		}
+		for (const file of files) {
+			const data = {}
+			const storageRef = ref(storage, `images/${uuidv4()}`)
 
-		if (arr.length > 0) {
-			const customId = uuidv4()
-			await setDoc(doc(db, 'products', customId), {
-				id: customId,
-				slug,
-				name,
-				description,
-				images: arr,
-				price: parseInt(price),
-				discount: parseInt(discount),
-				productCount: parseInt(productCount),
-				soldCount: 0,
-				isFavorite: false,
-				rating: [],
-				comments: [],
-				likes: [],
-				authorId: user.uid,
-				createdAt: new Date().getTime(),
+			await uploadBytes(storageRef, file).then((snapshot) => {
+				toast.update(id, {
+					render: `Đang tải lên hình ảnh ${Math.round(
+						((arr.length + 1) / length) * 100
+					)}%`,
+				})
+				data.path = snapshot.metadata.fullPath
 			})
-				.then(() => {
-					toast.update(id, {
-						render: 'Đăng sản phẩm thành công! Quay về trang chủ để xem bạn nhá',
-						type: 'success',
-						autoClose: 4000,
-						isLoading: false,
-					})
 
-					dispatch(
-						updateData({
-							recent: {
-								...user.recent,
-								shop: [
-									...user.recent.shop,
-									{
-										id: customId,
-										value: `Tải sản phẩm ${name}`,
-									},
-								],
-							},
-						})
-					)
-				})
-				.catch((err) => console.log(err))
-				.finally(() => {
-					toast.dismiss(id)
-					setLoading(false)
-					setName('')
-					setDescription('')
-					setPrice(0)
-					setDiscount(0)
-					setProductCount(0)
-					setFiles([])
-					setPreviews([])
-				})
+			const url = await getDownloadURL(storageRef)
+			data.url = url
+
+			arr.push(data)
 		}
+
+		const customId = uuidv4()
+		await setDoc(doc(db, 'products', customId), {
+			id: customId,
+			slug,
+			name,
+			description,
+			images: arr,
+			price: parseInt(price),
+			discount: parseInt(discount),
+			productCount: parseInt(productCount),
+			sizes,
+			soldCount: 0,
+			isFavorite: false,
+			rating: [],
+			comments: [],
+			likes: [],
+			authorId: user.uid,
+			createdAt: new Date().getTime(),
+		})
+			.then(() => {
+				toast.update(id, {
+					render: 'Tải sản phẩm lên thành công!',
+					type: 'success',
+					autoClose: 4000,
+					isLoading: false,
+				})
+
+				dispatch(
+					updateData({
+						recent: {
+							...user.recent,
+							shop: [
+								...user.recent.shop,
+								{
+									id: customId,
+									value: `Tải sản phẩm ${name}`,
+								},
+							],
+						},
+					})
+				)
+			})
+			.catch((err) => console.log(err))
+			.finally(() => {
+				toast.dismiss(id)
+				setLoading(false)
+				setName('')
+				setDescription('')
+				setPrice(0)
+				setDiscount(0)
+				setProductCount(0)
+				setFiles([])
+				setPreviews([])
+				setSizes([])
+			})
 	}
+
+	const inputClass =
+		'block max-w-[400px] py-2 px-3 border rounded-full text-lg font-semibold outline-none focus:bg-gray-200 transition'
 
 	if (loading) return <Loading />
 
@@ -248,9 +275,9 @@ function Upload() {
 						className='shrink-0 block w-full font-bold text-xl md:text-2xl outline-none resize-none overflow-hidden bg-white'
 						placeholder='Tên sản phẩm'
 						spellCheck='false'
-						maxLength={150}
+						maxLength={300}
 						value={name}
-						onChange={(e) => setName(e.target.value)}
+						onChange={handleChangeName}
 					/>
 
 					<TextareaAutosize
@@ -263,23 +290,55 @@ function Upload() {
 					/>
 
 					<div className='flex flex-col gap-3'>
+						<div className='border max-w-[400px] p-2 rounded-md'>
+							{sizes.length > 0 && (
+								<div className='flex items-center flex-wrap gap-3 overflow-hidden mb-2'>
+									{sizes.map((s, i) => (
+										<div
+											key={uuidv4()}
+											className='flex items-center gap-2 w-fit p-1 px-2 bg-gray-200 rounded-full'>
+											<span className='overflow-hidden font-bold break-words'>
+												{s}
+											</span>
+											<button
+												onClick={() =>
+													handleDeleteSize(i)
+												}>
+												<IoClose />
+											</button>
+										</div>
+									))}
+								</div>
+							)}
+
+							<input
+								type='text'
+								className='block w-full text-lg outline-none bg-transparent rounded-md'
+								placeholder='Nhập và enter (Size)'
+								maxLength={4}
+								onKeyDown={handleAddSize}
+							/>
+						</div>
+
 						<input
 							type='text'
-							className='block max-w-[400px] py-2 px-3 border rounded-full text-lg font-semibold outline-none focus:border-gray-900 transition'
+							className={inputClass}
 							placeholder='Số lượng sản phẩm'
 							value={productCount}
 							onChange={(e) => setProductCount(e.target.value)}
 						/>
+
 						<input
 							type='text'
-							className='block max-w-[400px] py-2 px-3 border rounded-full text-lg font-semibold outline-none focus:border-gray-900 transition'
+							className={inputClass}
 							placeholder='Giá sản phẩm (đ)'
 							value={price}
 							onChange={(e) => setPrice(e.target.value)}
 						/>
+
 						<input
 							type='text'
-							className='block max-w-[400px] py-2 px-3 border rounded-full text-lg font-semibold outline-none focus:border-gray-900 transition'
+							className={inputClass}
 							placeholder='Giảm giá (%)'
 							value={discount}
 							onChange={(e) => setDiscount(e.target.value)}
@@ -304,8 +363,8 @@ function Upload() {
 
 					{previews.length > 0 && (
 						<div className='grid grid-cols-3 gap-3 mt-3'>
-							{previews.map((preview, index) => (
-								<div key={index}>
+							{previews.map((preview) => (
+								<div key={uuidv4()}>
 									<img
 										src={preview}
 										alt={preview}

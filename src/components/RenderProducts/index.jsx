@@ -37,8 +37,8 @@ function RenderProducts({ data }) {
 						<div>
 							<Link to={`/product/${product.slug}`}>
 								<Image
-									src={product.images[0]}
-									alt={product.images[0]}
+									src={product.images[0].url}
+									alt={product.images[0].url}
 									className='w-full h-[140px] md:h-[200px] object-cover'
 								/>
 							</Link>

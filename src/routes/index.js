@@ -17,6 +17,7 @@ import Cart from '~/pages/Cart'
 import Profile from '~/pages/Profile'
 import Shop from '~/pages/Seller/Shop'
 import Recent from '~/pages/Recent'
+import Checkout from '~/pages/Checkout'
 
 // Layout
 import { NoSidebar } from '~/layouts'
@@ -97,5 +98,10 @@ export const privateRoutes = [
 	{
 		path: '/recent',
 		component: Recent,
+	},
+	{
+		path: '/checkout',
+		component: Checkout,
+		layout: null,
 	},
 ]

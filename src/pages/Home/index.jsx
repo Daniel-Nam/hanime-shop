@@ -11,14 +11,9 @@ function Home() {
 
 	useEffect(() => {
 		const fetchData = async () => {
-			const arr = []
-
 			const querySnapshot = await getDocs(collection(db, 'products'))
-			querySnapshot.forEach((doc) => {
-				arr.push(doc.data())
-			})
-
-			setProducts(arr)
+			const data = querySnapshot.docs.map((doc) => doc.data())
+			setProducts(data)
 			setIsLoading(false)
 		}
 

@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import {
 	BsTwitter,
 	BsYoutube,
@@ -6,7 +7,7 @@ import {
 	BsLink45Deg,
 } from 'react-icons/bs'
 
-const renderIcons = (name) => {
+function RenderIcons({ name }) {
 	switch (name) {
 		case 'twitter':
 			return <BsTwitter className='text-sky-500' />
@@ -23,4 +24,4 @@ const renderIcons = (name) => {
 	}
 }
 
-export default renderIcons
+export default memo(RenderIcons)

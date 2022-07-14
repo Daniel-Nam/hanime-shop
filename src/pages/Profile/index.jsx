@@ -6,9 +6,10 @@ import { BsPatchCheckFill } from 'react-icons/bs'
 import { BiCopy } from 'react-icons/bi'
 import { MdAdminPanelSettings } from 'react-icons/md'
 
-import { formatDate, handleURL, renderIcons } from '~/utils'
+import { formatDate, handleURL } from '~/utils'
 import { userSelector } from '~/store/reducers/userSlice'
 import Image from '~/components/Image'
+import RenderIcons from '~/components/RenderIcons'
 
 function Profile() {
 	const linkRef = useRef()
@@ -109,7 +110,9 @@ function Profile() {
 						<div
 							key={item.id}
 							className='flex items-center gap-3 py-2 px-3 border rounded-sm max-w-fit'>
-							<div>{renderIcons(item.name)}</div>
+							<div>
+								<RenderIcons name={item.name} />
+							</div>
 							<div>
 								{item.url ? (
 									<a
