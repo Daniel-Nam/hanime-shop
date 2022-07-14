@@ -6,7 +6,7 @@ import { BsPatchCheckFill } from 'react-icons/bs'
 import { BiCopy } from 'react-icons/bi'
 import { MdAdminPanelSettings } from 'react-icons/md'
 
-import { formatDate, handleURL } from '~/utils'
+import { formatDate, formatURL } from '~/utils'
 import { userSelector } from '~/store/reducers/userSlice'
 import Image from '~/components/Image'
 import RenderIcons from '~/components/RenderIcons'
@@ -96,7 +96,7 @@ function Profile() {
 						ref={linkRef}
 						to={'/@' + user.username}
 						className='inline-block text-lg text-blue-500'>
-						{handleURL('profile', `@${user.username}`)}
+						{formatURL('profile', `@${user.username}`)}
 					</Link>
 					<button onClick={handleCopy} className='btn btn-primary'>
 						<BiCopy />

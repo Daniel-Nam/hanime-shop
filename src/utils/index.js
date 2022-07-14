@@ -31,6 +31,6 @@ export const formatDate = (timestamp) => {
 	return new Intl.DateTimeFormat('vi-VN', options).format(timestamp)
 }
 
-export const handleURL = (from, to) => {
+export const formatURL = (from, to) => {
 	return window.location.href.replace(from, to)
 }

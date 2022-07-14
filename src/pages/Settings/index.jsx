@@ -4,7 +4,7 @@ import { userSelector } from '~/store/reducers/userSlice'
 
 import { toast } from 'react-toastify'
 import { db, doc, deleteDoc } from '~/config'
-import { handleURL } from '~/utils'
+import { formatURL } from '~/utils'
 import SettingField from './SettingField'
 import SettingImages from './SettingImages'
 
@@ -29,7 +29,7 @@ function Settings() {
 			title: 'tên người dùng',
 			data: user.username,
 			fn: 'username',
-			desc: handleURL('settings', `@${user.username}`),
+			desc: formatURL('settings', `@${user.username}`),
 			isUsername: true,
 		},
 		{

@@ -19,7 +19,7 @@ import {
 import { formatPrice, calcAndFormat } from '~/utils'
 import { userSelector, setData } from '~/store/reducers/userSlice'
 import Loading from '~/components/Loading'
-import StarRating from '~/components/StarRating'
+import StarRating from './StarRating'
 import giCungRe from '~/assets/images/gi-cung-re.svg'
 import AuthorProfile from './AuthorProfile'
 import Counter from './Counter'
@@ -29,10 +29,10 @@ import Comments from './Comments'
 import Description from './Description'
 
 function ProductDetail() {
+	const { slug } = useParams()
 	const user = useSelector(userSelector)
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
-	const { slug } = useParams()
 	const [product, setProduct] = useState()
 	const [author, setAuthor] = useState()
 	const [preview, setPreview] = useState()

@@ -1,7 +1,7 @@
 import { useState, useEffect, memo } from 'react'
 
 import { db, collection, getDocs } from '~/config'
-import Slider from '~/components/Slider'
+import Slider from './Slider'
 import Loading from '~/components/Loading'
 import RenderProducts from '~/components/RenderProducts'
 

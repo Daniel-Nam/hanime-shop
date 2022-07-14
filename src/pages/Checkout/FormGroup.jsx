@@ -1,12 +1,21 @@
-import { useId, memo } from 'react'
+import { useId, memo, useState } from 'react'
 
-function FormGroup({ label, name }) {
+function FormGroup({ label, name, data, type, disabled }) {
+	const [value, setValue] = useState(data)
 	const id = useId()
 
 	return (
-		<div>
+		<div className='form-group'>
 			<label htmlFor={id}>{label}</label>
-			<input type='text' id={id} name={name} />
+			<input
+				type={type || 'text'}
+				id={id}
+				name={name}
+				className='form-input'
+				value={value}
+				onChange={(e) => setValue(e.target.value)}
+				disabled={disabled}
+			/>
 		</div>
 	)
 }

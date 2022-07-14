@@ -16,7 +16,7 @@ function CartItem({ data, handleDelete }) {
 
 			<div>
 				<Image
-					src={data.images[0]}
+					src={data.images[0].url}
 					alt=''
 					className='w-24 h-24 md:w-32 md:h-32 rounded-full border shadow object-cover mx-auto'
 				/>
