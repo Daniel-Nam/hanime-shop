@@ -74,6 +74,12 @@ function Comments({ product, fetchData, user }) {
 				const uploadTask = await uploadBytes(storageRef, file)
 				const url = await getDownloadURL(storageRef)
 				images.push(url)
+
+				toast.update(id, {
+					render: `Đang gửi bình luận... ${Math.floor(
+						(images.length / files.length) * 100
+					)}%`,
+				})
 			}
 		}
 

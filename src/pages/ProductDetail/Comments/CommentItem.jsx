@@ -3,6 +3,7 @@ import { AiFillDislike, AiFillLike } from 'react-icons/ai'
 import { BsFillReplyFill } from 'react-icons/bs'
 import { v4 as uuidv4 } from 'uuid'
 import { doc, db, updateDoc } from '~/config'
+import { toast } from 'react-toastify'
 import clsx from 'clsx'
 
 function CommentItem({ comment, user, product }) {
@@ -18,6 +19,7 @@ function CommentItem({ comment, user, product }) {
 	const handleOpen = (url) => window.open(url, '_blank')
 
 	const handleLike = async () => {
+		const id = toast.loading('Đang thực hiện...')
 		setIsLike(!isLike)
 		setLikeLength(likeLength + (isLike ? -1 : 1))
 		setIsDislike(false)
@@ -41,9 +43,20 @@ function CommentItem({ comment, user, product }) {
 				newComment,
 			],
 		})
+			.then(() =>
+				toast.update(id, {
+					type: 'success',
+					render: 'Đã thực hiện thành công',
+					isLoading: false,
+					autoClose: 2000,
+				})
+			)
+			.catch((err) => toast.error(err.message))
+			.finally(() => toast.dismiss(id))
 	}
 
 	const handleDislike = async () => {
+		const id = toast.loading('Đang thực hiện...')
 		setIsDislike(!isDislike)
 		setIsDislikeLength(dislikeLength + (isDislike ? -1 : 1))
 		setIsLike(false)
@@ -67,6 +80,16 @@ function CommentItem({ comment, user, product }) {
 				newComment,
 			],
 		})
+			.then(() =>
+				toast.update(id, {
+					type: 'success',
+					render: 'Đã thực hiện thành công',
+					isLoading: false,
+					autoClose: 2000,
+				})
+			)
+			.catch((err) => toast.error(err.message))
+			.finally(() => toast.dismiss(id))
 	}
 
 	return (
