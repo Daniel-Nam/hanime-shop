@@ -73,8 +73,8 @@ function Header() {
 				<h1 className='uppercase text-lg font-semibold'>hanime shop</h1>
 			</div>
 
-			<Search dispatch={dispatch} />
 			<MobileMenu {...settings} />
+			<Search dispatch={dispatch} />
 			<Actions {...settings} />
 		</header>
 	)
